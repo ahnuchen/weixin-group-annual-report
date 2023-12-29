@@ -1,0 +1,116 @@
+.main {
+  padding: 20px;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.title{
+  height: 40px;
+  font-size: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+.emojiBig {
+  img {
+    width: 40px;
+    height: 40px;
+  }
+}
+.emojiImg {
+  img {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.gifBig {
+  width: 180px;
+  margin: 0 auto;
+  margin-top: 10px;
+  img {
+    width: 100%;
+  }
+}
+.gifImg {
+  img {
+    width: 52px;
+    height: 52px;
+  }
+}
+.em {
+  font-size: 16px;
+  font-weight: bold;
+  color: #FF0000;
+}
+
+.flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.textDesc {
+  font-size: 14px;
+  line-height: 22px;
+  font-style: italic;
+  letter-spacing: 2px;
+}
+
+.text {
+  margin-top: 8px;
+  @extend .textDesc;
+}
+
+.rankNum {
+  width: 40px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.subtitle {
+  height: 40px;
+  line-height: 40px;
+  font-weight: bold;
+  font-size: 17px;
+  text-align: center;
+}
+
+.rankHead {
+  height: 38px;
+  @extend .flexCenter;
+}
+
+.emojiRankItem {
+  height: 34px;
+  border-bottom: 1px solid rgba(#eee, .5);
+  @extend .flexCenter;
+}
+
+.gifRankItem {
+  height: 64px;
+  border-bottom: 1px solid rgba(#eee, .5);
+  @extend .flexCenter;
+}
+
+.count {
+  width: 26px;
+  color: #ff5500;
+}
+
+
+.messageRankItem {
+  height: 52px;
+  border-bottom: 1px solid rgba(#eee, .5);
+  @extend .flexCenter;
+  :global {
+    .userItem {
+      flex: 1;
+    }
+  }
+}

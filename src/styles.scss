@@ -1,0 +1,97 @@
+html {
+}
+#root {
+  background-color: #f3f3f3;
+  max-width: 10rem;
+  margin: 0 auto;
+}
+.avatar {
+  img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+  }
+
+}
+
+.displayname {
+  margin-left: 13px;
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: darkgray;
+}
+
+
+.item {
+  white-space: pre-wrap;
+  margin-top: 15px;
+  display: flex;
+  width: 100%;
+}
+.bubble {
+  max-width: 300px;
+  padding: 10px;
+  border-radius: 5px;
+  position: relative;
+  color: #000;
+  word-wrap: break-word;
+  word-break: normal;
+}
+.item-left .bubble {
+  margin-left: 15px;
+  background-color: #fff;
+}
+
+.item-left .bubble:before {
+  content: " ";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-top: 10px solid transparent;
+  border-right: 10px solid #fff;
+  border-bottom: 10px solid transparent;
+  left: -20px;
+}
+
+.displayname {
+  margin-left: 13px;
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: darkgray;
+}
+.chat-image {
+  max-width: 300px;
+  font-size: 0;
+  padding: 0 18px;
+}
+.chat-image img,.chat-file img {
+  max-width: 100%;
+}
+
+.avatar img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
+.item.item-center {
+  justify-content: center;
+}
+
+.item.item-center span {
+  font-size: 12px;
+  padding: 2px 4px;
+  color: #fff;
+  background-color: #dadada;
+  border-radius: 3px;
+  -moz-user-select: none;
+  /*火狐*/
+  -webkit-user-select: none;
+  /*webkit浏览器*/
+  -ms-user-select: none;
+  /*IE10*/
+  -khtml-user-select: none;
+  /*早期浏览器*/
+  user-select: none;
+}
