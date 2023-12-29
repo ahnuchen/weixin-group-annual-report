@@ -8,8 +8,9 @@
 </details>
 
 # ⌛使用
-1. 请先使用[WeChatMsg](https://github.com/LC044/WeChatMsg)导出群聊聊天记录
-2. git clone或者下载本项目到WeChatMsg生成的群组聊天记录文件夹下面
+1. 请先使用留痕[WeChatMsg](https://github.com/LC044/WeChatMsg)导出群聊html格式的聊天记录
+   ![img.png](docs/img4.png)
+2. git clone或者下载本项目到WeChatMsg生成的群组聊天记录文件夹下面，如下图
 
    ![./docs/img.png](./docs/img.png)
 3. 确保电脑有nodejs运行环境，在`weixin-group-annual-report`目录下执行命令安装依赖
