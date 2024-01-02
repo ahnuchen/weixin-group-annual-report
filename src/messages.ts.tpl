@@ -15,3 +15,5 @@ export interface IMessage {
 }
 
 export const messages: IMessage[] = {{{messages}}}
+
+export const wordCountList = {{{wordCountList}}}

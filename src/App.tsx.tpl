@@ -1,15 +1,17 @@
-import {IMessage, messages} from './messages.ts'
+import {IMessage, messages, wordCountList} from './messages.ts'
 import styles from './App.module.scss'
 import UserMsg from "./components/user-msg";
 import TimeCenter from "./components/time-center";
 import dayjs from 'dayjs'
+import WordCloud from "./components/word-cloud";
 import {countEmoji, getPerEmojiCount, replaceEmoji} from "./utils";
 import User from "./components/user";
+import HourRank from "./components/hour-rank";
 
 
 const groupName = '{{{groupName}}}'
 
-function sortByCountDesc <T extends Record<'count', number>>(ls: T[]): T[] {
+function sortByCountDesc<T extends Record<'count', number>>(ls: T[]): T[] {
     return ls.sort((a, b) => b.count - a.count)
 }
 
@@ -22,6 +24,7 @@ function countMsgType() {
     let fileCount = 0 // 文件消息
     let emojiCount = 0 // 表情
     const dayCountMap: Record<string, number> = {}
+    const hourCountMap: Record<string, number> = {}
     const emojiCountMap: Record<string, number> = {}
     const gifCountMap: Record<string, number> = {}
     const messagePersonCountMap: Record<string, { count: number, avatar: string }> = {}
@@ -43,13 +46,20 @@ function countMsgType() {
             }
         }
 
+
         if (message.timestamp) {
             const timeStamp = message.timestamp * 1000
             const day = dayjs(timeStamp).format('YYYY-MM-DD')
+            const hour = dayjs(timeStamp).format('HH')
             if (!dayCountMap[day]) {
                 dayCountMap[day] = 1
             } else {
                 dayCountMap[day] = dayCountMap[day] + 1
+            }
+            if (!hourCountMap[hour]) {
+                hourCountMap[hour] = 1
+            } else {
+                hourCountMap[hour] = hourCountMap[hour] + 1
             }
         }
         let textEmojiCount: Record<string, number> = {}
@@ -67,7 +77,7 @@ function countMsgType() {
             }
         } else if (message.type === 3) {
             if (message.text.startsWith('http')) {
-                if(!gifCountMap[message.text]) {
+                if (!gifCountMap[message.text]) {
                     gifCountMap[message.text] = 1
                 } else {
                     gifCountMap[message.text] = gifCountMap[message.text] + 1
@@ -94,6 +104,10 @@ function countMsgType() {
         videoCount,
         fileCount,
         emojiCount,
+        hourCountList: Object.keys(hourCountMap).map(hour => ({
+            hour,
+            count: hourCountMap[hour]
+        })).sort((a, b) => Number(b.hour) - Number(a.hour)),
         dayCountList: sortByCountDesc(Object.keys(dayCountMap).map(day => ({
             day,
             count: dayCountMap[day]
@@ -119,7 +133,9 @@ function countMsgType() {
 const counts = countMsgType()
 
 
-function App() {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export default function App() {
 
     const topEmojiList = counts.emojiCountList.slice(0, 10)
     const topGifList = counts.gifCountList.slice(0, 10)
@@ -153,6 +169,15 @@ function App() {
                     className={styles.em}>{counts.dayCountList[0].count}</span>条消息，“你们上班还需要工作吗？”
                 </div>
             </div>
+
+            <div className={styles.card}>
+                <div className={styles.textDesc}>群内最常出现的词汇有：</div>
+                <WordCloud wordCountList={wordCountList}/>
+            </div>
+            <div className={styles.card}>
+                <div className={styles.textDesc}>各时间段消息数量分布：</div>
+                <HourRank hourCountList={counts.hourCountList}/>
+            </div>
             <div className={styles.card}>
                 <div className={styles.textDesc}>最受欢迎的微信表情是：</div>
                 <div className={styles.emojiBig} dangerouslySetInnerHTML={ {__html: counts.emojiCountList[0].img} }></div>
@@ -174,7 +199,7 @@ function App() {
             <div className={styles.card}>
                 <div className={styles.textDesc}>最受欢迎的表情包是：</div>
                 <div className={styles.gifBig}>
-                    <img src={topGifList[0].img} alt="" />
+                    <img src={topGifList[0].img} alt=""/>
                 </div>
             </div>
             <div className={styles.card}>
@@ -187,7 +212,7 @@ function App() {
                     {topGifList.map((item, index) => <div className={styles.gifRankItem}>
                         <div className={styles.rankNum}>{index + 1}</div>
                         <div className={styles.gifImg}>
-                            <img src={item.img} alt="" />
+                            <img src={item.img} alt=""/>
                         </div>
                         <div className={styles.count}>{item.count}</div>
                     </div>)}
@@ -224,5 +249,3 @@ function App() {
         </div>
     )
 }
-
-export default App

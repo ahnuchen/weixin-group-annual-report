@@ -4,7 +4,7 @@
 ## 🥤效果
 
 <details>
-<img src="https://xue.ccy1994.top/img/20231229-172316.jpg" title="群聊年度聊天报告" width="500"/>
+<img src="https://xue.ccy1994.top/img/20240102-164853.png" title="群聊年度聊天报告" width="500"/>
 </details>
 
 # ⌛使用
