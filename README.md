@@ -3,9 +3,7 @@
 
 ## 🥤效果
 
-<details>
 <img src="https://xue.ccy1994.top/img/20240102-164853.png" title="群聊年度聊天报告" width="500"/>
-</details>
 
 # ⌛使用
 1. 请先使用留痕[WeChatMsg](https://github.com/LC044/WeChatMsg)导出群聊html格式的聊天记录
@@ -18,7 +16,7 @@
     # xxx/weixin-group-annual-report>
     npm install
     ```
-4. ！！！安装依赖完成会提示选择生成报告的年份，一定要选
+4. ！！！安装依赖完成会提示选择生成报告的年份，一定要选,也可以再次手动执行 `npm run prepare`重新选择年份
 
     ![img.png](docs/img2.png)
 
