@@ -155,6 +155,7 @@ export default function App() {
                 <div className={styles.text}><span className={styles.em}>{counts.textCount}</span>条文字消息</div>
                 <div className={styles.text}><span className={styles.em}>{counts.imgCount}</span>张图片</div>
                 <div className={styles.text}><span className={styles.em}>{counts.gifCount}</span>个表情包</div>
+                <div className={styles.text}><span className={styles.em}>{counts.videoCount}</span>个视频</div>
                 <div className={styles.text}><span className={styles.em}>{counts.fileCount}</span>个文件</div>
                 <div className={styles.text}><span className={styles.em}>{counts.emojiCount}</span>个微信表情</div>
             </div>
@@ -162,7 +163,7 @@ export default function App() {
             <TimeCenter message={firstMessage}/>
             <UserMsg message={firstMessage}/>
             <div className={styles.card}>
-                <div className={styles.textDesc}>全年有<span className={styles.em}>{counts.dayCountList.length}</span>天都有人群里在发言
+                <div className={styles.textDesc}>{{{rangeStr}}}有<span className={styles.em}>{counts.dayCountList.length}</span>天都有人群里在发言
                 </div>
                 <div className={styles.textDesc}>最活跃的一天是<span
                     className={styles.em}>{counts.dayCountList[0].day}</span>，这天群里有<span

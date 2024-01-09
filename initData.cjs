@@ -271,14 +271,14 @@ async function main() {
     let startTime
     let endTime
     let rangeStr
-    if(value.range === 'lastweek') {
+    if(value.range === 'week') {
         startTime = dayjs().startOf('week')
         endTime = dayjs()
-        rangeStr = `${startTime.format('YYYY')}年第${startTime.week()}`
-    } else if(value.range === 'week') {
+        rangeStr = `${startTime.format('YYYY')}年第${startTime.week()}周`
+    } else if(value.range === 'lastweek') {
         startTime = dayjs().subtract(1,'week').startOf('week')
         endTime = dayjs().subtract(1,'week').endOf('week')
-        rangeStr = `${startTime.format('YYYY')}年第${startTime.week()}`
+        rangeStr = `${startTime.format('YYYY')}年第${startTime.week()}周`
     }else if(value.range === 'lastmonth') {
         startTime = dayjs().subtract(1,'month').startOf('month')
         endTime = dayjs().subtract(1,'month').endOf('month')

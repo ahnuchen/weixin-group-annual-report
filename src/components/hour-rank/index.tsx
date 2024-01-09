@@ -61,6 +61,10 @@ export default function HourRank({hourCountList}:HourRankProps) {
                 }
             ]
         })
+
+        window.addEventListener('resize', function () {
+            chart.resize()
+        })
     }, [mainRef, hourCountList]);
     return <div className={styles.main} ref={mainRef}>
 
