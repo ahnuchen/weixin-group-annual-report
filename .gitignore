@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 src/messages.ts
+index.html
+src/App.tsx
+vite.config.ts

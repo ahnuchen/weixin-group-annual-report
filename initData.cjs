@@ -2,10 +2,14 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const dayjs = require('dayjs')
+const weekOfYear = require('dayjs/plugin/weekOfYear')
+
 const {prompts, generateFile, chalk} = require('@umijs/utils')
 const nodejieba = require('nodejieba')
-
-const parentDir = path.resolve('../')
+require("dayjs/locale/zh-cn");
+// config dayjs
+dayjs.locale('zh-cn');
+dayjs.extend(weekOfYear)
 
 const emojiText = [
     '[',
@@ -121,23 +125,6 @@ const emojiText = [
     '转圈',
 ]
 
-const dirs = parentDir.split(path.sep)
-
-const groupName = dirs[dirs.length - 1]
-const htmlFilePath = path.join('../', groupName + '.html')
-const fileExits = fs.existsSync(htmlFilePath)
-if (!fileExits) {
-    throw new Error('请将文件夹放在导出的聊天记录{群聊名称}.html同级目录下，确保已经导出聊天为html')
-}
-
-const htmlFile = fs.readFileSync(htmlFilePath, 'utf-8')
-
-
-const startStr = 'const chatMessages ='
-const startIndex = htmlFile.indexOf(startStr)
-const endIndex = htmlFile.indexOf(`function checkEnter(event) {`)
-let messagesStr = htmlFile.slice(startIndex + startStr.length, endIndex)
-const allMessages = eval(messagesStr);
 
 // 生成词汇出现量的排行
 function getWordRank(messages) {
@@ -223,7 +210,41 @@ function getWordRank(messages) {
     return wordCountList
 }
 
+
 async function main() {
+
+    let parentDir = path.resolve('../')
+    let dirs = parentDir.split(path.sep)
+    let groupName = dirs[dirs.length - 1]
+    let htmlFilePath = path.join(parentDir, groupName + '.html')
+    const fileExits = fs.existsSync(htmlFilePath)
+    if (!fileExits) {
+        let customDir = await prompts([
+            {
+                type: 'text',
+                name: 'dir',
+                message: '输入导出的群聊html聊天记录目录',
+            }
+        ])
+        parentDir = path.resolve(customDir.dir)
+        dirs = parentDir.split(path.sep)
+        groupName = dirs[dirs.length - 1]
+        htmlFilePath = path.join(parentDir, groupName + '.html')
+        if(!fs.existsSync(htmlFilePath)) {
+            throw new Error('请输入正确的聊天记录导出目录，或者将文件夹放在导出的聊天记录{群聊名称}.html同级目录下，确保已经导出聊天为html')
+        }
+    }
+
+    const htmlFile = fs.readFileSync(htmlFilePath, 'utf-8')
+
+    const startStr = 'const chatMessages ='
+    const startIndex = htmlFile.indexOf(startStr)
+    const endIndex = htmlFile.indexOf(`function checkEnter(event) {`)
+    let messagesStr = htmlFile.slice(startIndex + startStr.length, endIndex)
+    const allMessages = eval(messagesStr);
+
+
+
     const currentYear = dayjs().format('YYYY')
     const yearValue = Number(currentYear)
     const prevYears = [yearValue]
@@ -233,22 +254,62 @@ async function main() {
     let value = await prompts([
         {
             type: 'select',
-            name: 'year',
-            message: '选择要生成报告的年份',
-            choices: prevYears.map(title => ({title, value: `${title}`})),
+            name: 'range',
+            message: '选择要生成报告的时间段',
+            choices: [
+                {title: '上周', value: 'lastweek'},
+                {title: '本周', value: 'week'},
+                {title: '上个月', value: 'lastmonth'},
+                {title: '本月', value: 'month'},
+                ...prevYears.map(title => ({title:`${title}年`, value: `${title}`}))
+            ],
         }
     ])
 
     console.log(chalk.green('正在过滤聊天记录...'))
-
-    const messages = allMessages.filter(item => {
-        if (item.timestamp) {
-            if (dayjs(item.timestamp * 1000).format('YYYY') === value.year) {
-                return true
+    let messages;
+    let startTime
+    let endTime
+    let rangeStr
+    if(value.range === 'lastweek') {
+        startTime = dayjs().startOf('week')
+        endTime = dayjs()
+        rangeStr = `${startTime.format('YYYY')}年第${startTime.week()}`
+    } else if(value.range === 'week') {
+        startTime = dayjs().subtract(1,'week').startOf('week')
+        endTime = dayjs().subtract(1,'week').endOf('week')
+        rangeStr = `${startTime.format('YYYY')}年第${startTime.week()}`
+    }else if(value.range === 'lastmonth') {
+        startTime = dayjs().subtract(1,'month').startOf('month')
+        endTime = dayjs().subtract(1,'month').endOf('month')
+        rangeStr = `${startTime.format('YYYY')}年${startTime.format('M')}月`
+    }else if(value.range === 'month') {
+        startTime = dayjs().startOf('month')
+        endTime = dayjs()
+        rangeStr = `${startTime.format('YYYY')}年${startTime.format('M')}月`
+    }
+    if(startTime && endTime) {
+        messages = allMessages.filter(item => {
+            if (item.timestamp) {
+                let messageTime = dayjs(item.timestamp * 1000)
+                if (messageTime.isAfter(startTime) && messageTime.isBefore(endTime)) {
+                    return true
+                }
             }
-        }
-        return false
-    })
+            return false
+        })
+    } else {
+        rangeStr = `${value.range}年`
+        messages = allMessages.filter(item => {
+            if (item.timestamp) {
+                if (dayjs(item.timestamp * 1000).format('YYYY') === value.range) {
+                    return true
+                }
+            }
+            return false
+        })
+    }
+
     console.log(chalk.green('正在生成词云...'))
 
     const wordCountList = getWordRank(messages).slice(0, 100)
@@ -258,6 +319,7 @@ async function main() {
         './index.html',
         './src/App.tsx',
         './src/messages.ts',
+        './vite.config.ts',
     ]
 
     await Promise.all(templates.map(tpl => {
@@ -267,6 +329,8 @@ async function main() {
             baseDir: __dirname,
             data: {
                 groupName,
+                rangeStr,
+                publicPath: JSON.stringify(parentDir),
                 wordCountList: JSON.stringify(wordCountList),
                 messages: JSON.stringify(messages)
             }

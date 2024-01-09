@@ -4,7 +4,7 @@ import pxtoviewport from 'postcss-px-to-viewport'
 import legacy from '@vitejs/plugin-legacy'
 // https://vitejs.dev/config/
 export default defineConfig({
-  publicDir: '../',
+  publicDir: {{{publicPath}}},
   plugins: [react(),
     legacy({
       targets: ['defaults', 'ie >= 11', 'chrome 52'],  //需要兼容的目标列表，可以设置多个

@@ -145,7 +145,7 @@ export default function App() {
 
     return (
         <div className={styles.main}>
-            <div className={styles.title}>{groupName}2023年度报告</div>
+            <div className={styles.title}>{groupName}{{{rangeStr}}}报告</div>
             <div className={styles.card}>
                 <div className={styles.text}>{groupName}群里一共有<span
                     className={styles.em}>{counts.messagePersonCountList.length}</span>人参与发了<span
@@ -158,7 +158,7 @@ export default function App() {
                 <div className={styles.text}><span className={styles.em}>{counts.fileCount}</span>个文件</div>
                 <div className={styles.text}><span className={styles.em}>{counts.emojiCount}</span>个微信表情</div>
             </div>
-            <div className={styles.text}>2023年群内第一条消息：</div>
+            <div className={styles.text}>{{{rangeStr}}}群内第一条消息：</div>
             <TimeCenter message={firstMessage}/>
             <UserMsg message={firstMessage}/>
             <div className={styles.card}>
@@ -219,7 +219,7 @@ export default function App() {
                 </div>
             </div>
             <div className={styles.card}>
-                <div className={styles.textDesc}>今年群里最活跃的人是：</div>
+                <div className={styles.textDesc}>{{{rangeStr}}}群里最活跃的人是：</div>
                 <br/>
                 <User message={ {
                     avatar_path: counts.messagePersonCountList[0].avatar,
