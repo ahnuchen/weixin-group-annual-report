@@ -10,6 +10,16 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "description": "微信群年度/月度/周度聊天报告,2023群聊年度报告,词云,消息时间段分布图表，生成网页、长图",
+  "engines": {
+    "node": ">=10 <=16"
+  },
+  "repository": {
+    "url": "https://github.com/ahnuchen/weixin-group-annual-report"
+  },
+  "bugs": {
+    "url": "https://github.com/ahnuchen/weixin-group-annual-report/issues"
+  },
   "dependencies": {
     "@types/lodash.sortby": "^4.7.9",
     "classnames": "^2.5.0",
@@ -18,7 +28,7 @@
     "dayjs": "^1.11.10",
     "echarts": "^5.4.3",
     "lib-flexible": "^0.3.2",
-    "nodejieba": "^2.6.0",
+    "nodejieba": "^2.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

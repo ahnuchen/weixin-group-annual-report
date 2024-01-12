@@ -224,15 +224,23 @@ async function main() {
                 type: 'text',
                 name: 'dir',
                 message: '输入导出的群聊html聊天记录目录',
+                validate(v){
+                    parentDir = path.resolve(v)
+                    dirs = parentDir.split(path.sep)
+                    groupName = dirs[dirs.length - 1]
+                    htmlFilePath = path.join(parentDir, groupName + '.html')
+                    if(!fs.existsSync(htmlFilePath)) {
+                        return '请输入正确的聊天记录导出目录，或者将本项目文件夹放在导出的聊天记录{群聊名称}.html同级目录下'
+                    } else {
+                        return true
+                    }
+                }
             }
         ])
-        parentDir = path.resolve(customDir.dir)
-        dirs = parentDir.split(path.sep)
-        groupName = dirs[dirs.length - 1]
-        htmlFilePath = path.join(parentDir, groupName + '.html')
-        if(!fs.existsSync(htmlFilePath)) {
-            throw new Error('请输入正确的聊天记录导出目录，或者将文件夹放在导出的聊天记录{群聊名称}.html同级目录下，确保已经导出聊天为html')
-        }
+        // parentDir = path.resolve(customDir.dir)
+        // dirs = parentDir.split(path.sep)
+        // groupName = dirs[dirs.length - 1]
+        // htmlFilePath = path.join(parentDir, groupName + '.html')
     }
 
     const htmlFile = fs.readFileSync(htmlFilePath, 'utf-8')
