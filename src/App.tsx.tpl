@@ -226,7 +226,7 @@ export default function App() {
                     avatar_path: counts.messagePersonCountList[0].avatar,
                     displayname: counts.messagePersonCountList[0].displayname
                 } }/>
-                <div className={styles.text}>今年Ta贡献了<span
+                <div className={styles.text}>{{{rangeStr}}}Ta贡献了<span
                     className={styles.em}>{counts.messagePersonCountList[0].count}</span>条群聊消息
                 </div>
             </div>

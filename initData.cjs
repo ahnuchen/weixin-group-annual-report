@@ -155,6 +155,16 @@ function getWordRank(messages) {
     const userDict = path.resolve(targetDictPath, 'user.dict.utf8')
     const idfDict = path.resolve(targetDictPath, 'idf.utf8')
     const stopWordDict = path.resolve(targetDictPath, 'stop_words.utf8')
+
+    const customStopWordsDir = path.join(__dirname, 'stopwords')
+
+    fs.readdirSync(customStopWordsDir).forEach(fileName => {
+        if(fileName.endsWith('.txt')) {
+            let fileContent = fs.readFileSync(path.join(customStopWordsDir, fileName), 'utf-8')
+            fs.appendFileSync(stopWordDict, fileContent)
+        }
+    })
+
     const displaynames = [...new Set(messages.map(item => item.displayname))]; //昵称自动加入用户自定义词典
     const customWords = ['外包', '张三', '李四']; //自定义分词词典
 
@@ -190,9 +200,10 @@ function getWordRank(messages) {
             for (const emoji of emojiText) {
                 text = text.replace(new RegExp(`[${emoji}]`, 'gm'), '')
             }
-            const txtArr = nodejieba.cut(text)
-            for (const textItem of txtArr) {
-                if(textItem.length === 1 || !isChina(textItem) || stopWords.includes(textItem)) { // 排除不包含汉字的词汇,排除一个字,排除停用词
+            const txtArr = nodejieba.extract(text, 4)
+            for (const wordWeight of txtArr) {
+                const {word:textItem} = wordWeight
+                if(textItem.length === 1 || !isChina(textItem)) { // 排除不包含汉字的词汇,排除一个字,排除停用词
                     continue;
                 }
                 if (!wordMap[textItem]) {
@@ -269,6 +280,7 @@ async function main() {
                 {title: '本周', value: 'week'},
                 {title: '上个月', value: 'lastmonth'},
                 {title: '本月', value: 'month'},
+                {title: '全部', value: 'all'},
                 ...prevYears.map(title => ({title:`${title}年`, value: `${title}`}))
             ],
         }
@@ -278,7 +290,7 @@ async function main() {
     let messages;
     let startTime
     let endTime
-    let rangeStr
+    let rangeStr = ''
     if(value.range === 'week') {
         startTime = dayjs().startOf('week')
         endTime = dayjs()
@@ -306,6 +318,9 @@ async function main() {
             }
             return false
         })
+    } else if(value.range === 'all') {
+        messages = allMessages
+        rangeStr = '全部'
     } else {
         rangeStr = `${value.range}年`
         messages = allMessages.filter(item => {
