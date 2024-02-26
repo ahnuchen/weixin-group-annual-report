@@ -258,7 +258,7 @@ async function main() {
 
     const startStr = 'const chatMessages ='
     const startIndex = htmlFile.indexOf(startStr)
-    const endIndex = htmlFile.indexOf(`function checkEnter(event) {`)
+    const endIndex = htmlFile.indexOf(`</script>`)
     let messagesStr = htmlFile.slice(startIndex + startStr.length, endIndex)
     const allMessages = eval(messagesStr);
 
