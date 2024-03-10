@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
@@ -5,11 +7,14 @@ const dayjs = require('dayjs')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
 
 const {prompts, generateFile, chalk} = require('@umijs/utils')
-const nodejieba = require('nodejieba')
+const Segment = require('novel-segment')
 require("dayjs/locale/zh-cn");
 // config dayjs
 dayjs.locale('zh-cn');
 dayjs.extend(weekOfYear)
+const nodejieba = new Segment() 
+nodejieba.useDefault();
+
 
 const emojiText = [
     '[',
@@ -128,71 +133,73 @@ const emojiText = [
 
 // 生成词汇出现量的排行
 function getWordRank(messages) {
-    const homedir = os.userInfo().homedir
+    // const homedir = os.userInfo().homedir
 
-    const targetDictPath = path.join(homedir, 'weixin-group-annual-report')
-    if (!fs.existsSync(targetDictPath)) {
-        fs.mkdirSync(targetDictPath)
+    // const targetDictPath = path.join(homedir, 'weixin-group-annual-report')
+    
+    // if (!fs.existsSync(targetDictPath)) {
+    //     fs.mkdirSync(targetDictPath)
+    // }
+    // const defaultDicts = [
+    //     'DEFAULT_USER_DICT',
+    //     'DEFAULT_DICT',
+    //     'DEFAULT_HMM_DICT',
+    //     'DEFAULT_IDF_DICT',
+    //     'DEFAULT_STOP_WORD_DICT',
+    // ]
+
+    // defaultDicts.forEach(dictPath => {
+        
+    //     const from = nodejieba[dictPath].split('/')
+    //     console.log(nodejieba[dictPath])
+    //     const fileName = from[from.length - 1]
+    //     const to = path.join(targetDictPath, fileName)
+    //     // nodejieba不识别中文路径，需要复制到临时路径
+    //     fs.copyFileSync(nodejieba[dictPath], to)
+    // })
+
+    // const defaultDict = path.resolve(targetDictPath, 'jieba.dict.utf8')
+    // const hmmDict = path.resolve(targetDictPath, 'hmm_model.utf8')
+    // const userDict = path.resolve(targetDictPath, 'user.dict.utf8')
+    // const idfDict = path.resolve(targetDictPath, 'idf.utf8')
+    const stopWordDict = path.join(__dirname, 'stopwordstemp')
+    if (!fs.existsSync(stopWordDict)) {
+        fs.mkdirSync(stopWordDict)
     }
-    const defaultDicts = [
-        'DEFAULT_USER_DICT',
-        'DEFAULT_DICT',
-        'DEFAULT_HMM_DICT',
-        'DEFAULT_IDF_DICT',
-        'DEFAULT_STOP_WORD_DICT',
-    ]
-
-    defaultDicts.forEach(dictPath => {
-        const from = nodejieba[dictPath].split('/')
-        const fileName = from[from.length - 1]
-        const to = path.join(targetDictPath, fileName)
-        // nodejieba不识别中文路径，需要复制到临时路径
-        fs.copyFileSync(nodejieba[dictPath], to)
-    })
-
-    const defaultDict = path.resolve(targetDictPath, 'jieba.dict.utf8')
-    const hmmDict = path.resolve(targetDictPath, 'hmm_model.utf8')
-    const userDict = path.resolve(targetDictPath, 'user.dict.utf8')
-    const idfDict = path.resolve(targetDictPath, 'idf.utf8')
-    const stopWordDict = path.resolve(targetDictPath, 'stop_words.utf8')
+    const stopWordDictPath = path.resolve(stopWordDict, 'stopwords.utf8')
 
     const customStopWordsDir = path.join(__dirname, 'stopwords')
 
     fs.readdirSync(customStopWordsDir).forEach(fileName => {
         if(fileName.endsWith('.txt')) {
             let fileContent = fs.readFileSync(path.join(customStopWordsDir, fileName), 'utf-8')
-            fs.appendFileSync(stopWordDict, fileContent)
+            fs.appendFileSync(stopWordDictPath, fileContent)
         }
     })
 
-    const displaynames = [...new Set(messages.map(item => item.displayname))]; //昵称自动加入用户自定义词典
-    const customWords = ['外包', '张三', '李四']; //自定义分词词典
+    // const displaynames = [...new Set(messages.map(item => item.displayname))]; //昵称自动加入用户自定义词典
+    // const customWords = ['外包', '张三', '李四']; //自定义分词词典
 
-    let userDictStr = '';
-    [...displaynames, ...customWords].forEach(name => {
-        if (name) {
-            userDictStr += `\n${name}`
-        }
-    })
+    // let userDictStr = '';
+    // [...displaynames, ...customWords].forEach(name => {
+    //     if (name) {
+    //         userDictStr += `\n${name}`
+    //     }
+    // })
 
-    fs.writeFileSync(userDict, userDictStr.slice(1))
+    // fs.writeFileSync(userDict, userDictStr.slice(1))
     try {
-        nodejieba.load({
-            dict: defaultDict,
-            hmmDict: hmmDict,
-            userDict: userDict,
-            idfDict: idfDict,
-            stopWordDict: stopWordDict,
-        });
+        nodejieba.loadStopwordDict(stopWordDictPath);
     } catch (e) {
-
+        console.log("加载StopWord出错")
     }
     function isChina(s) {
         const reg = new RegExp("[\\u4E00-\\u9FFF]+", "g");
         return reg.test(s);
     }
-    const stopWords = fs.readFileSync(stopWordDict, 'utf-8').split('\n')
+    // const stopWords = fs.readFileSync(stopWordDictPath, 'utf-8').split('\n')
     const wordMap = {};
+    
     for (const message of messages) {
         if (message.type === 1 || message.type === 49 && message.sub_type === 57) {
             let {text = ''} = message
@@ -200,20 +207,24 @@ function getWordRank(messages) {
             for (const emoji of emojiText) {
                 text = text.replace(new RegExp(`[${emoji}]`, 'gm'), '')
             }
-            const txtArr = nodejieba.extract(text, 4)
+            const txtArr = nodejieba.doSegment(text, {
+              stripStopword: true,
+              simple: true
+            });
+            
             for (const wordWeight of txtArr) {
-                const {word:textItem} = wordWeight
-                if(textItem.length === 1 || !isChina(textItem)) { // 排除不包含汉字的词汇,排除一个字,排除停用词
+                const {w} = wordWeight
+                if(!wordWeight||wordWeight.length === 1 || !isChina(wordWeight)) { // 排除不包含汉字的词汇,排除一个字,排除停用词
                     continue;
                 }
-                if (!wordMap[textItem]) {
-                    wordMap[textItem] = 1
+                if (!wordMap[wordWeight]) {
+                    wordMap[wordWeight] = 1
                 } else {
-                    wordMap[textItem] = wordMap[textItem] + 1
+                    wordMap[wordWeight] = wordMap[wordWeight] + 1
                 }
             }
         }
-    };
+    }
     const wordCountList = Object.keys(wordMap).map(word => ({
         word,
         count:wordMap[word]
