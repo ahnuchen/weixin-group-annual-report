@@ -28,7 +28,7 @@
     "dayjs": "^1.11.10",
     "echarts": "^5.4.3",
     "lib-flexible": "^0.3.2",
-    "nodejieba": "^2.5.2",
+    "novel-segment": "^2.7.116",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
