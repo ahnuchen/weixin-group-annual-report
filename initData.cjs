@@ -169,6 +169,7 @@ function getWordRank(messages) {
     const stopWordDictPath = path.resolve(stopWordDict, 'stopwords.utf8')
 
     const customStopWordsDir = path.join(__dirname, 'stopwords')
+    fs.writeFileSync(stopWordDictPath, '')
 
     fs.readdirSync(customStopWordsDir).forEach(fileName => {
         if(fileName.endsWith('.txt')) {
