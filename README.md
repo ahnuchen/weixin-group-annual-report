@@ -33,5 +33,3 @@
 8. 可以运行npm run build,打包网页发布
 
 9. 停用词表（词云过滤的词汇），可自行添加到[custom_stopwords.txt](stopwords%2Fcustom_stopwords.txt)
-
-10. 生成每个人的词云图，可用`personwordcloud`分支
